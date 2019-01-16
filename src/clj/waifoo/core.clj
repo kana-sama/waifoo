@@ -2,7 +2,7 @@
   (:require [compojure.core :as compojure]
             [ring.middleware.cors :refer [wrap-cors]]))
 
-(def value
+(defonce value
   (atom 0))
 
 (compojure/defroutes handler
@@ -11,16 +11,10 @@
     (compojure/GET "/inc" [] (str (swap! value inc)))
     (compojure/GET "/dec" [] (str (swap! value dec)))))
 
-
 (def app
-  (wrap-cors handler
-    :access-control-allow-origin #".*"
-    :access-control-allow-methods #{:get}))
-
-; (def app
-;   (-> handler
-;     (wrap-cors :access-control-allow-origin #".*"
-;                :access-control-allow-methods #{:get})))
+  (-> handler
+    (wrap-cors :access-control-allow-origin #".*"
+               :access-control-allow-methods #{:get})))
 
 (defn -main [& args]
   (println "Hello from BE"))
