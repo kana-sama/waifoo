@@ -10,10 +10,9 @@
   (reagent/atom true))
 
 (defn fetch [action]
-  (-> (str "http://localhost:3001/value/" action)
-    (http/get {:with-credentials? false}) 
-    (:body)
-    (int)))
+  (go (let [url (str "http://localhost:3001/value/" action)
+            response (<! (http/get url {:with-credentials? false}))]
+        (-> response :body int))))
 
 (defn dispatch [action]
   (go (reset! loading? true)
