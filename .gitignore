@@ -1,0 +1,4 @@
+resources/public/js/index.js
+resources/public/js/out
+target
+figwheel_server.log
