@@ -8,6 +8,7 @@
         com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
         com.bhauman/figwheel-main {:mvn/version "0.2.0"}
         ;; commmon
+        org.clojure/core.match {:mvn/version "0.3.0-alpha5"}
         com.taoensso/sente {:mvn/version "1.14.0-RC2"}
         ;; backend
         http-kit {:mvn/version "2.3.0"}

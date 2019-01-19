@@ -1,46 +1,31 @@
 (ns waifoo.core
-  (:require [reagent.core :as reagent]
+  (:require [clojure.core.match :refer [match]]
+            [reagent.core :as reagent]
             [taoensso.sente :as sente]))
 
-(let [{:keys [chsk ch-recv send-fn state]}
-      (sente/make-channel-socket! "/chsk" nil {:type :auto, :host "localhost:8081"})]
-  (def chsk       chsk)
-  (def ch-chsk    ch-recv)
-  (def chsk-send! send-fn)
-  (def chsk-state state))
+(def socket
+  (sente/make-channel-socket! "/chsk" nil {:type :auto, :host "localhost:8081"}))
 
-(def counter-value (reagent/atom :not-initialized)) 
+(defn send! [event]
+  ((:send-fn socket) event))
 
-(defmulti user-handler first)
-(defmethod user-handler :default [event]
-  (println "unhandled"))
-(defmethod user-handler :value/set [[_ value]]
-  (reset! counter-value value))
+(def state
+  (reagent/atom :not-initialized)) 
 
-(defmulti ws-handler* :id)
-(defmethod ws-handler* :default [message]
-  (println "unhandled"))
-(defmethod ws-handler* :chsk/handshake [message]
-  (chsk-send! [:value/get]))
-(defmethod ws-handler* :chsk/recv [{:as ev-msg :keys [id data event]}]
-  (user-handler (second event)))
-
-(defn ws-handler [{:as message :keys [event]}]
+(defn handler [{:keys [id event]}]
   (println ">" event)
-  (ws-handler* message))
+  (match event
+    [:chsk/handshake _] (send! [:value/get])
+    [:chsk/recv [:value/set value]] (reset! state value)
+    :else (println "?" id)))
 
-(defn counter []
-  (case @counter-value
+(defn view []
+  (case @state
     :not-initialized [:div "Loading..."]
     [:div "Counter: "
-      [:button {:on-click #(chsk-send! [:value/dec])} "-"]
-      [:span @counter-value]
-      [:button {:on-click #(chsk-send! [:value/inc])} "+"]]))
+      [:button {:on-click #(send! [:value/dec])} "-"]
+      [:span @state]
+      [:button {:on-click #(send! [:value/inc])} "+"]]))
 
-(defn start! []
-  (sente/start-client-chsk-router! ch-chsk ws-handler)
-  (reagent/render [counter] (js/document.getElementById "root")))
-
-(start!)
-
-
+(sente/start-client-chsk-router! (:ch-recv socket) handler)
+(reagent/render [view] (js/document.getElementById "root"))
