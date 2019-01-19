@@ -3,3 +3,6 @@ resources/public/js/out
 target
 figwheel_server.log
 .lein-repl-history
+.nrepl-port
+.cpcache
+.rebel_readline_history

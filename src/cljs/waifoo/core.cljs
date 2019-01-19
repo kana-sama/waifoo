@@ -1,34 +1,46 @@
 (ns waifoo.core
   (:require [reagent.core :as reagent]
-            [cljs-http.client :as http]
-            [cljs.core.async :refer [<!] :refer-macros [go]]))
+            [taoensso.sente :as sente]))
 
-(defonce counter-value
-  (reagent/atom 0))
+(let [{:keys [chsk ch-recv send-fn state]}
+      (sente/make-channel-socket! "/chsk" nil {:type :auto, :host "localhost:8081"})]
+  (def chsk       chsk)
+  (def ch-chsk    ch-recv)
+  (def chsk-send! send-fn)
+  (def chsk-state state))
 
-(def loading?
-  (reagent/atom true))
+(def counter-value (reagent/atom :not-initialized)) 
 
-(defn fetch [action]
-  (go (let [url (str "http://localhost:3001/value/" action)
-            response (<! (http/get url {:with-credentials? false}))]
-        (-> response :body int))))
+(defmulti user-handler first)
+(defmethod user-handler :default [event]
+  (println "unhandled"))
+(defmethod user-handler :value/set [[_ value]]
+  (reset! counter-value value))
 
-(defn dispatch [action]
-  (go (reset! loading? true)
-      (reset! counter-value (<! (fetch action)))
-      (reset! loading? false)))
+(defmulti ws-handler* :id)
+(defmethod ws-handler* :default [message]
+  (println "unhandled"))
+(defmethod ws-handler* :chsk/handshake [message]
+  (chsk-send! [:value/get]))
+(defmethod ws-handler* :chsk/recv [{:as ev-msg :keys [id data event]}]
+  (user-handler (second event)))
+
+(defn ws-handler [{:as message :keys [event]}]
+  (println ">" event)
+  (ws-handler* message))
 
 (defn counter []
-  (if @loading?
-    [:div "Loading..."]
+  (case @counter-value
+    :not-initialized [:div "Loading..."]
     [:div "Counter: "
-     [:button {:on-click #(dispatch "dec")} "-"]
-     [:span @counter-value]
-     [:button {:on-click #(dispatch "inc")} "+"]]))
+      [:button {:on-click #(chsk-send! [:value/dec])} "-"]
+      [:span @counter-value]
+      [:button {:on-click #(chsk-send! [:value/inc])} "+"]]))
 
-(defn run []
-  (dispatch "get")
+(defn start! []
+  (sente/start-client-chsk-router! ch-chsk ws-handler)
   (reagent/render [counter] (js/document.getElementById "root")))
 
-(run)
+(start!)
+
+

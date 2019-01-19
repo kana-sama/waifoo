@@ -1,0 +1,18 @@
+{:paths ["src/clj" "src/cljs" "target" "resources"]
+ :aliases {:rebel {:main-opts ["-m" "rebel-readline.main"]}
+           :front {:main-opts ["-m" "figwheel.main", "-b" "dev", "-r"]}}
+ :deps {org.clojure/clojure {:mvn/version "1.10.0"}
+        org.clojure/clojurescript {:mvn/version "1.10.439"}
+        ;; tools
+        com.bhauman/rebel-readline {:mvn/version "0.1.4"}
+        com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
+        com.bhauman/figwheel-main {:mvn/version "0.2.0"}
+        ;; commmon
+        com.taoensso/sente {:mvn/version "1.14.0-RC2"}
+        ;; backend
+        http-kit {:mvn/version "2.3.0"}
+        compojure {:mvn/version "1.6.1"}
+        ring/ring-core {:mvn/version "1.7.1"}
+        ring-cors {:mvn/version "0.1.12"}
+        ;; frontend
+        reagent {:mvn/version "0.8.1"}}}
