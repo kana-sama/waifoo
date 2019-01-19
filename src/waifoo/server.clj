@@ -1,4 +1,4 @@
-(ns waifoo.core
+(ns waifoo.server
   (:require [waifoo.config :as config]
             [clojure.core.match :refer [match]]
             [org.httpkit.server :as http-kit]

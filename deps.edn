@@ -1,4 +1,4 @@
-{:paths ["src/clj" "src/cljc" "src/cljs" "target" "resources"]
+{:paths ["src" "target" "resources"]
  :aliases {:rebel {:main-opts ["-m" "rebel-readline.main"]}
            :front {:main-opts ["-m" "figwheel.main", "-b" "dev", "-r"]}}
  :deps {org.clojure/clojure {:mvn/version "1.10.0"}

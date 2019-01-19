@@ -1,4 +1,4 @@
-(ns waifoo.core
+(ns waifoo.client
   (:require [waifoo.config :as config]
             [clojure.core.match :refer [match]]
             [reagent.core :as reagent]
