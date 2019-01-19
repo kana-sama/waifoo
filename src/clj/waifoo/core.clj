@@ -1,5 +1,6 @@
 (ns waifoo.core
-  (:require [clojure.core.match :refer [match]]
+  (:require [waifoo.config :as config]
+            [clojure.core.match :refer [match]]
             [org.httpkit.server :as http-kit]
             [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
@@ -39,6 +40,6 @@
   (wrap-keyword-params)
   (wrap-params)
   (wrap-reload)
-  (http-kit/run-server {:port 8081}))
+  (http-kit/run-server {:port config/port}))
 
 (sente/start-server-chsk-router! (:ch-recv socket) handler)

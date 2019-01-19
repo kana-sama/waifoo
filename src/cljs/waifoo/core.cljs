@@ -1,10 +1,13 @@
 (ns waifoo.core
-  (:require [clojure.core.match :refer [match]]
+  (:require [waifoo.config :as config]
+            [clojure.core.match :refer [match]]
             [reagent.core :as reagent]
             [taoensso.sente :as sente]))
 
 (def socket
-  (sente/make-channel-socket! "/chsk" nil {:type :auto, :host "localhost:8081"}))
+  (sente/make-channel-socket! "/chsk" nil
+    {:type :auto
+     :host (str "localhost:" config/port)}))
 
 (defn send! [event]
   ((:send-fn socket) event))
