@@ -35,17 +35,25 @@
   (compojure/GET "/chsk" req ((:ajax-get-or-ws-handshake-fn socket) req))
   (compojure/POST "/chsk" req ((:ajax-post-fn socket) req)))
 
-(defmacro restartable
-  "Automatically free resource on module reload.
-  Define stop-<process-name> for freeing resource manualy."
-  [process-name constructor]
-  (let [stop (symbol (str "stop-" (name process-name)))]
-    `(do (defonce ~stop (atom (fn [])))
-         (@~stop)
-         (reset! ~stop ~constructor)
-         (info (color-str :blue "[Re]Starting " ~process-name)))))
+(defmacro defservice
+  "Define service (start and stop commands) which will automatically stops on reload."
+  [service constructor]
+  (let [service-name (name service)
+        instance (symbol service-name)
+        stop (symbol (str "stop-" service-name "!"))
+        start (symbol (str "start-" service-name "!"))]
+    `(do (defonce ~instance (atom nil))
+         (defn ~stop []
+           (when-not (nil? @~instance)
+             (@~instance)
+             (reset! ~instance nil)))
+         (defn ~start []
+           (~stop)
+           (reset! ~instance ~constructor)
+           (info (color-str :blue "[Re]Starting " ~service-name)))
+         (~start))))
 
-(restartable :web-server
+(defservice web-server
   (-> routes
     (wrap-cors :access-control-allow-origin #".*", :access-control-allow-methods #{:get})
     (wrap-keyword-params)
@@ -53,5 +61,5 @@
     (wrap-reload)
     (http-kit/run-server {:port config/port})))
 
-(restartable :ws-router
+(defservice ws-router
   (sente/start-server-chsk-router! (:ch-recv socket) handler))
