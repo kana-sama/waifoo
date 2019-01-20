@@ -2,12 +2,14 @@
   (:require [waifoo.config :as config]
             [clojure.core.match :refer [match]]
             [reagent.core :as reagent]
+            [taoensso.timbre :refer [warn]]
             [taoensso.sente :as sente]))
 
 (def socket
   (sente/make-channel-socket! "/chsk" nil
     {:type :auto
-     :host (str "localhost:" config/port)}))
+     :host (str "localhost:" config/port)
+     :wrap-recv-evs? false}))
 
 (defn send! [event]
   ((:send-fn socket) event))
@@ -16,11 +18,10 @@
   (reagent/atom :not-initialized)) 
 
 (defn handler [{:keys [id event]}]
-  (println ">" event)
   (match event
     [:chsk/handshake _] (send! [:value/get])
-    [:chsk/recv [:value/set value]] (reset! state value)
-    :else (println "?" id)))
+    [:value/set value] (reset! state value)
+    :else (warn "Unhandled" event)))
 
 (defn view []
   (case @state
