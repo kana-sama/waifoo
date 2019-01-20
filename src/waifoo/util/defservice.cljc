@@ -1,9 +1,5 @@
 (ns waifoo.util.defservice
-  (:require [taoensso.timbre :refer [info]]))
-
-(defn color-str [color & args]
-  #?(:clj  (apply taoensso.timbre/color-str color args)  
-     :cljs (apply str args)))
+  (:require [waifoo.util.logging :refer [info]]))
 
 (defmacro defservice
   "Define service (start and stop commands) which will automatically stops on reload."
@@ -20,5 +16,5 @@
          (defn ~start []
            (~stop)
            (reset! ~instance ~constructor)
-           (info (color-str :blue "[Re]Starting " ~service-name)))
+           (info "[Re]Starting" ~service-name))
          (~start))))

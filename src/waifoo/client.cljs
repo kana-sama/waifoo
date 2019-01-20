@@ -1,9 +1,9 @@
 (ns waifoo.client
   (:require [waifoo.config :as config]
             [waifoo.util.defservice :refer-macros [defservice]]
+            [waifoo.util.logging :refer [warn]]
             [clojure.core.match :refer [match]]
             [reagent.core :as reagent]
-            [taoensso.timbre :refer [warn]]
             [taoensso.sente :as sente]))
 
 (def socket

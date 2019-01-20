@@ -1,11 +1,11 @@
 (ns waifoo.server
   (:require [waifoo.config :as config]
             [waifoo.util.defservice :refer [defservice]]
+            [waifoo.util.logging :refer [warn]]
             [clojure.core.match :refer [match]]
             [org.httpkit.server :as http-kit]
             [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
-            [taoensso.timbre :refer [color-str info warn]]
             [compojure.core :as compojure]
             [ring.middleware.cors :refer [wrap-cors]]
             [ring.middleware.reload :refer [wrap-reload]]
@@ -84,7 +84,7 @@
     [:waifoo/new-todo description] (add-todo! description)
     [:waifoo/remove-todo todo-id] (remove-todo! todo-id)
     [:waifoo/toggle-todo todo-id] (toggle-todo! todo-id)
-    :else (warn (color-str :yellow "Unhandled " event))))
+    :else (warn "Unhandled" event)))
 
 (compojure/defroutes routes
   (compojure/GET "/chsk" req ((:ajax-get-or-ws-handshake-fn socket) req))

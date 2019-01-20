@@ -10,7 +10,6 @@
         ;; commmon
         org.clojure/core.match {:mvn/version "0.3.0-alpha5"}
         com.taoensso/sente {:mvn/version "1.14.0-RC2"}
-        com.taoensso/timbre {:mvn/version "4.10.0"}
         lynxeyes/dotenv {:mvn/version "1.0.2"}
         ;; backend
         http-kit {:mvn/version "2.3.0"}
