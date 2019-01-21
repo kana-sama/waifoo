@@ -2,7 +2,7 @@ backend repl:
 
 ```
 $ clj -A:rebel
-> (use 'waifoo.server)
+> (use 'waifoo.server.core :reload)
 ```
 
 frontend repl:
