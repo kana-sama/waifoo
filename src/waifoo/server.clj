@@ -2,6 +2,7 @@
   (:require [waifoo.config :as config]
             [waifoo.util.defservice :refer [defservice]]
             [waifoo.util.logging :refer [warn]]
+            [waifoo.repo.todo :as todo]
             [clojure.core.match :refer [match]]
             [org.httpkit.server :as http-kit]
             [taoensso.sente :as sente]
@@ -53,38 +54,16 @@
 ; (datomic/transact database-connection
 ;   {:tx-data [[:db/cas 17592186045445 :counter/value + 1]]})
 
-(defonce todos
-  (atom []))
-
-(defn new-id []
-  (if (empty? @todos)
-    0
-    (->> @todos (map :todo/id) (apply max) inc)))
-
-(defn add-todo! [description]
-  (let [todo #:todo{:id (new-id), :description description, :active? true}]
-    (swap! todos #(cons todo %))
-    (broadcast! [:waifoo/new-todo todo])))
-
-(defn remove-todo! [id]
-  (swap! todos #(filter (fn [todo] (not= id (:todo/id todo))) %))
-  (broadcast! [:waifoo/remove-todo id]))
-
-(defn toggle-todo! [id]
-  (swap! todos
-    #(map (fn [todo]
-            (if (== (:todo/id todo) id)
-              (update todo :todo/active? not)
-              todo)) %))
-  (broadcast! [:waifoo/toggle-todo id]))
-
 (defn handler [{:keys [id uid event]}]
   (match event
-    [:waifoo/init] (send! uid [:waifoo/set-todos @todos])
-    [:waifoo/new-todo description] (add-todo! description)
-    [:waifoo/remove-todo todo-id] (remove-todo! todo-id)
-    [:waifoo/toggle-todo todo-id] (toggle-todo! todo-id)
-    :else (warn "Unhandled" event)))
+    [:app/init] (send! uid [:todo/init (todo/get-all)])
+    [:todo/add description] (let [todo (todo/add! description)]
+                                 (broadcast! [:todo/upsert todo]))
+    [:todo/remove todo-id] (do (todo/remove! todo-id)
+                               (broadcast! [:todo/remove todo-id]))
+    [:todo/toggle todo-id] (let [todo (todo/toggle! todo-id)]
+                                (broadcast! [:todo/upsert todo]))
+    :else (warn "Unhandled " event)))
 
 (compojure/defroutes routes
   (compojure/GET "/chsk" req ((:ajax-get-or-ws-handshake-fn socket) req))
