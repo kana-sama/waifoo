@@ -1,0 +1,7 @@
+{:lein true
+ :builds {:frontend
+          {:output-dir "resources/public/js"
+           :target :browser
+           :modules {:main {:entries [waifoo.client]}}
+           :asset-path "js"
+           :devtools {:watch-dir "resources/public/"}}}}

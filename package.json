@@ -1,0 +1,20 @@
+{
+  "name": "waifoo",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kana-sama/waifoo.git"
+  },
+  "scripts": {
+    "shadow-cljs": "shadow-cljs",
+    "watch": "shadow-cljs watch frontend",
+    "repl": "shadow-cljs cljs-repl frontend"
+  },
+  "dependencies": {
+    "create-react-class": "^15.6.3",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0"
+  },
+  "devDependencies": {
+    "shadow-cljs": "^2.7.24"
+  }
+}

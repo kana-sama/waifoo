@@ -1,8 +1,11 @@
-resources/public/js/index.js
-resources/public/js/out
+resources/public/js
 target
 figwheel_server.log
 .lein-repl-history
 .nrepl-port
 .cpcache
 .rebel_readline_history
+.env
+.vscode
+.shadow-cljs
+node_modules

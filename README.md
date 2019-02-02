@@ -1,12 +1,18 @@
 backend repl:
 
 ```
-$ clj -A:rebel
-> (use 'waifoo.server.core :reload)
+lein repl
+> (reset)
 ```
 
-frontend repl:
+frontend watch:
 
 ```
-$ clj -A:front
+npm run watch
+```
+
+AFTER frontend repl:
+
+```
+npm run repl
 ```
