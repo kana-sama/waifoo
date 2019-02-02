@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "create-react-class": "^15.6.3",
+    "moment": "^2.24.0",
     "react": "^16.7.0",
-    "react-dom": "^16.7.0"
+    "react-dom": "^16.7.0",
+    "react-time": "^4.3.0"
   },
   "devDependencies": {
     "shadow-cljs": "^2.7.24"

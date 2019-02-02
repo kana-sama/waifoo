@@ -3,7 +3,8 @@
             [waifoo.util.defservice :refer-macros [defservice]]
             [waifoo.util.logging :refer [warn]]
             [reagent.core :as reagent]
-            [taoensso.sente :as sente]))
+            [taoensso.sente :as sente]
+            ["react-time" :default Time]))
 
 (def socket
   (sente/make-channel-socket! "/chsk" nil
@@ -44,10 +45,11 @@
          (reset! new-name value)))]
 
     [:form {:on-submit handle-submit}
-     [:input {:value @new-name
-              :on-change handle-change
-              :required true}]
-     [:button "Add"]]))
+     [:input
+      {:value @new-name
+       :on-change handle-change
+       :required true}]
+     [:button "Add"]])) 
 
 (defn view-user [{:user/keys [id name]}]
   [:div
@@ -67,8 +69,17 @@
    [view-new-user-form]
    [view-users-list]])
 
+(defn view-time []
+  (reagent/with-let
+    [now (reagent/atom (js/Date.now))
+     interval (js/setInterval #(reset! now (js/Date.now)) (/ 1000 60))]
+    [:> Time {:value @now, :format "m:s:SSS"}]
+    (finally (js/clearInterval interval))))
+
 (defn view []
-  [view-users])
+  [:<>
+   [view-time]
+   [view-users]])
 
 (defn start-controller []
   (sente/start-client-chsk-router!
